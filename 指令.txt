@@ -1,0 +1,16 @@
+复制文件 sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak
+
+安装nano
+sudo apt-get install nano -y
+
+安装ssh服务器
+sudo apt-get install openssh-server -y
+
+开启端口1337
+sudo ufw allow 1337
+
+查看ssh服务是否开启
+sudo service ssh status
+
+查看文件 ls
+查看文件列表 ll
