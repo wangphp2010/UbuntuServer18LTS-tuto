@@ -1,3 +1,18 @@
+$ ssh tony@192.168.0.40 
+1234
+
+当前主机名
+$ hostname -f
+
+设置主机名
+$ sudo hostnamectl set-hostname <your-fqdn> 
+
+查看时间
+$ date
+
+设置时区
+$ sudo dpkg-reconfigure tzdata
+
 复制文件 sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak
 
 安装nano
@@ -5,6 +20,16 @@ sudo apt-get install nano -y
 
 安装ssh服务器
 sudo apt-get install openssh-server -y
+
+查看进程
+sudo netstat -ap
+
+查看各个端口监听的服务
+sudo netstat -ntlup
+ 
+
+查看tcp端口 
+netstat -tupln
 
 开启端口1337
 sudo ufw allow 1337
@@ -14,3 +39,84 @@ sudo service ssh status
 
 查看文件 ls
 查看文件列表 ll
+
+
+在云端服务器运行本地文件
+ssh toby@192.168.0.11 python < marchel.py
+其中pachong.py 是本地文件
+
+把本地的a.py b.py 复制到云端Desktop文件夹下
+$ scp {a,b}.py tony@192.168.0.40:~/desktop/
+
+
+从云端复制到本地
+$ scp tony@192.168.0.40:~/Desktop/b.py  c.py 
+
+在云端打开窗口
+$ ssh tony@192.168.0.40 "export DISPLAY=:0; python3  ./desktop/marchel.py"
+
+
+linux下设置共享目录
+https://blog.csdn.net/jisuanji_wjfioj/article/details/51770088
+
+查看服务列表
+service --status-all
+service --status-all | grep postfix  
+
+服务操作
+systemctl is-enabled servicename.service #查询服务是否开机启动 
+systemctl enable *.service #开机运行服务 
+systemctl disable *.service #取消开机运行 
+systemctl start *.service #启动服务 
+systemctl stop *.service #停止服务 
+systemctl restart *.service #重启服务 
+systemctl reload *.service #重新加载服务配置文件 
+systemctl status *.service #查询服务运行状态
+
+
+
+更新所有
+$ sudo apt-get update
+
+ubuntu 版本查看
+$ cat /proc/version
+
+$ lsb_release -a
+
+
+
+
+
+
+
+Ubuntu系统
+启动 # sudo /etc/init.d/apache2 start
+停止 # sudo /etc/init.d/apache2 stop
+重启 # sudo /etc/init.d/apache2 restart
+
+
+退出
+ctrl+D
+
+成为superuser 超级管理员
+$ sudo -i
+
+
+删除指令
+rm dd
+rm -rf dd 删除文件夹
+
+改名文件所有权 把文件夹test 改为test所有 组名为nogroup test:nogroup(用户名:组名)
+sudo chown -R test:nogroup /var/www/test 
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,161 @@
+
+https://www.linuxdashen.com/ubuntu%E6%90%AD%E5%BB%BA%E7%AE%80%E6%98%93postfix%E9%82%AE%E7%AE%B1%E6%9C%8D%E5%8A%A1%E5%99%A8$
+
+$ sudo apt-get install postfix
+
+检查配置文件，如果没用发现语法错误，不会输出任何内容
+$ sudo postfix check 
+
+版本查看
+$ sudo postconf mail_version
+
+查看监听情况 Postfix的master进程监听TCP 25号端口
+$ sudo netstat -lnpt 
+
+25号端口是否被防火墙或主机商屏蔽。nmap可以帮助我们扫描服务器的开放端口
+$ sudo nmap 192.168.0.40 
+
+发送测试邮件
+$ echo "test email" | sendmail  philippe660@gmail.com
+
+使用mail程序来发送邮件，查看收件箱
+$ sudo apt install mailutils
+
+$ mail philippe660@gmail.com
+Cc: 
+Subject: 2nd test email
+I'm sending this email using the mail program.
+
+输入主题和正文后，按Ctrl+D来发送邮件。
+
+要查看收件箱，输入mail就行了。
+$ mail
+
+要查看第一封邮件，输入数字1。如果邮件只显示了一半，按Enter键来显示剩下的消息。
+将所有邮件从第一封排序，输入h。
+要显示最后一屏邮件，输入h$或z。
+阅读下一封邮件，输入n。
+删除第一封邮件，输入d 1。
+删除第一封，第二封和第四封邮件，输入d 1 2 4。
+删除前10封邮件，输入d 1-10。
+回复第1封邮件，输入reply 1。
+退出mail程序，输入q或x。
+
+
+
+
+查看邮件保存位置
+$ postconf mail_spool_directory 
+
+日志文件
+/var/log/mail.log 收发日志  
+/var/log/mail.err 错误日志
+
+
+当前主机名
+$ hostname -f
+
+$ telnet serve_tony 25  测试
+> 输入 EHLO myserver
+输入 quit 来退出 telnet
+
+
+
+postfix 默认tcp 端口25 
+
+
+
+修改配置
+$ postconf -d 查看默认配置
+$ postconf -n 查看当前配置
+$ postconf -e 'key=value' 修改配置 最好用单引号
+$ systemctl restart postfix 重启
+
+指令
+https://www.linuxidc.com/Linux/2017-09/147032.htm
+
+查看发送队列
+$ postqueue -p
+刷新发送队列
+$ postqueue -f 
+查看邮件日志
+$ tail -f /var/log/mail.log
+刪除所有在 Queue 中的邮件
+$ postsuper -d ALL
+刪除所有正在 deferred 队列中的邮件 (删除曾经发送失败的邮件 )
+$ postsuper -d ALL deferred
+查看信件內容
+$ postcat -q Queue_ID
+
+
+不进行发送地址伪装
+$ postconf -e "masquerade_exceptions = root"  
+
+修改为默认配置
+sudo postconf -e 'mydestination = $myhostname, localhost.$mydomain, localhost'
+sudo postconf -e 'mydomain = localdomain'
+sudo postconf -e 'myhostname = serve_tony.localdomain'
+sudo postconf -e 'mynetworks = 127.0.0.0/8 192.168.0.0/24 172.17.0.0/16 [::1]/128 [2a01:e35:2429:9220::]/64 [fe80::]/64'
+sudo postconf -e 'myorigin = $myhostname'
+
+postfix 基本配置
+inet_interfaces = all
+mydestination = $myhostname, loalhost_mail, serve_tony, localhost.localdomain, localhost
+mydomain = serve_tony.net
+myhostname = mail.serve_tony.net
+mynetworks = 127.0.0.0/8  192.168.0.0/24
+myorigin = $mydomain
+
+
+
+
+
+通过gmail 等中继站 发送邮件
+https://www.youtube.com/watch?v=yU5yF9mF_bY&t=130s
+
+Step 1
+$ sudo apt-get update 
+
+$ sudo apt-get install ssmtp
+
+$ sudo apt-get install postfix
+
+$ sudo apt-get install postfix mailutils libsasl2-2 ca-certificates libsasl2-modules
+
+$ sudo nano /etc/postfix/main.cf 主配置文件
+
+Step 4
+
+add the following line to it 
+
+replayhost = [smtp.gmail.com]:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_option = noanonymous
+smtp_tls_CAfile = /etc/postfix/cacert.pem
+smtp_use_tls = yes
+
+Step 5
+
+$ sudo nano /etc/postfix/sasl_passwd
+
+add the following line to it 
+
+[smtp.gmail.com]:587 USERNAME@gmail.com:PASSWORD
+
+Step 6 Set file permissions
+$ sudo chmod 777 /etc/postfix/sasl_passwd
+
+Step 7 Update postfix config to use sasl_passwd file
+$ sudo postmap /etc/postfix/sasl_passwd
+
+Step 8 Validate certificates
+$ cat /etc/ssl/cert/thawte_Primary_Root_CA.pem | sudo tee -a /etc/postfix/cacert.pem
+
+Step 9 Reload postfix config for changes
+$ sudo /etc/init.d/postfix.reload
+
+Step 10 Send a test mail
+$ echo "Test mail from me." | mail -s "Test mail" yanick2019@yahoo
+
+Step 11 Set your gmail account as less secure , logging into your gamil account using browser

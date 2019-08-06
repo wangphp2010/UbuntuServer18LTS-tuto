@@ -1,0 +1,17 @@
+安装PHP 7.3的命令
+
+通过下面的命令安装PHP 7.3：
+
+$ sudo apt-get install software-properties-common
+
+$ sudo add-apt-repository ppaondrejphp
+
+$ sudo apt-get update
+
+$ sudo apt-get install -y php7.3
+
+参考：在Ubuntu 18.04或CentOS 7系统上安装PHP 7.3。
+
+安装完成后，使用以下命令检查安装的PHP版本：
+
+$ php -v 

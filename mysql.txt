@@ -1,0 +1,34 @@
+sudo apt-get update
+
+sudo apt-get install mysql-server
+
+sudo mysql_secure_installation
+
+密码: 234fsfe4fD@
+
+systemctl status mysql.service
+
+sudo mysql -uroot -p234fsfe4fD@
+
+mysql>select database();
+mysql>status;
+mysql>show tables;
+
+mysql>show databases; //可以查看有哪些数据库,返回数据库名(databaseName)
+mysql>create databases post ; //可以查看有哪些数据库,返回数据库名(databaseName)
+
+mysql>use databaseName;  //更换当前使用的数据库
+
+mysql>show tables; //返回当前数据库下的所有表的名称
+或者也可以直接用以下命令
+mysql>show tables from databaseName;//databaseName可以用show databases得来
+
+mysql查看表结构命令，如下:
+desc 表名;
+show columns from 表名;
+或者
+describe 表名;
+show create table 表名;
+或者
+use information_schema
+select * from columns where table_name='表名';
