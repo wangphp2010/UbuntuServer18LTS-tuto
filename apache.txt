@@ -1,0 +1,199 @@
+
+## 安装apache2
+
+### 1 安装
+```bash
+# 安装之前确认一下安装包信息
+$ apt-cache show apache2
+
+#确认本地tcp端口使用情况
+$ nmap 127.0.0.1
+
+$ sudo apt-get install apache2
+$ nmap 127.0.0.1
+
+#测试刚刚安装的服务器
+$ curl http://127.0.0.1
+
+```
+
+
+### 2 配置
+
+# 检查设置文件语法错误
+$ apache2ctl -title
+
+**目录: /etc/apache2**
+
+* apache2.conf
+    + 全局配置文件,记载服务器基本设置内容,一半轻易不需要改变
+* conf-available和conf-enabled(a2enconf,a2disconf)
+    + 服务器配置文件,主要用于apache内部参数设置,例如:字符集,安全配置等
+* mods-available 和mods-enabled(a2enmod,a2dismod)
+    + 服务器的模块配置,也是apache扩展功能配置,
+* sites-available和sites-enabled(a2ensite,a2dissite)
+    + 内部站点的配置,可以用一台apache服务器配置多个站点,同时也可以在这里配置ssl网站
+* envvars
+    + 存放环境变量
+* magic 
+    + http传输的多媒体类型设置,一半不需要修改
+* ports.conf
+    + 服务器端口配置,一般http为80,https为443 
+
+### 3 ssl模块
+
+```bash
+#查看一安装模块
+$ cd  mods-available
+$ ls
+#启用模块
+$ sudo a2enmod ssl
+#禁用模块
+$ sudo a2dismod ssl
+#重启apach
+$ sudo service apache2 restart / systemctl restart apache2
+
+```
+
+### 4 设置服务器名称
+
+```bash
+$ sudo nano /etc/apache2/apache2.conf
+...
+ServerName myvideo.com
+...
+# 重启apache
+$ sudo service apache2 restart / systemctl restart apache2
+
+```
+### 5 apache 文档目录的修改
+
+```bash
+$ cd /etc/apache2
+$ ll sites-available/ #查看哪些网站可用
+$ ll sites-enabled/ # 查看使用中的网站
+$ sudo a2dissite 000-default # 禁用该网站
+$ systemctl reload apache2 # 重新载入
+$ curl http://127.0.0.1
+
+
+#### 新建自己的网站
+$ sudo nano sites-available/myvideo.conf #配置或新建自己的网站
+
+...
+<VirtualHost *:80>
+    ServerName www.myvideo.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/myvideo
+    ErrorLog ${APACHE_LOG_DIR}/myvideo_error.log
+    CustomLog ${APACHE_LOG_DIR}/myvideo_acces.log combined
+</VirtualHost>
+...
+
+
+...
+<VirtualHost *:3000>要在ports.conf里开启3000端口
+    ServerName www.MaSuperAgence.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/symfony1/MaSuperAgence/public
+    ErrorLog ${APACHE_LOG_DIR}/MaSuperAgence.log
+    CustomLog ${APACHE_LOG_DIR}/MaSuperAgence_acces.log combined
+</VirtualHost>
+...
+
+$ sudo mkdir -p /var/www/myvideo
+$ sudo chown tony:root -R /var/www/myvideo/ # 一般权限
+$ cd /var/www/myvideo
+$ nano index.html
+...html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+   
+    <title>myvideo</title>
+</head>
+<body>
+    <h1> MYVIDEO home site</h1>
+    
+</body>
+</html>
+...
+#启动刚刚设置的网站
+$ sudo a2ensite myvideo
+# 重启服务器
+$ sudo service apache2 restart /  systemctl reload apache2 
+
+
+错误日志路径
+/var/log/apache2
+
+关闭开启其它服务apache2 功能
+sudo a2dismod mpm_event
+sudo a2enmod mpm_event
+ 
+sudo a2enmod mpm_prefork cgi
+sudo a2dismod mpm_prefork cgi
+
+sudo a2enmod mpm_prefork php7.3
+sudo a2dismod mpm_prefork php7.3
+
+
+查看外部端口
+sudo ufw  status
+
+
+打开或者关闭或者重启防火墙：
+ufw  enable|disable|reload
+
+打开某端口
+
+sudo ufw allow 80 
+
+
+执行python程序
+$ sudo a2enmod cgi 
+
+/etc/apache2/sites-available/mypython.conf
+...
+<VirtualHost *:3001>
+    ServerName www.mypython.com
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/mypython
+
+    <Directory /var/www/mypython>
+        Options +ExecCGI
+        DirectoryIndex index.py
+    </Directory>
+    AddHandler cgi-script .py
+	
+    ErrorLog ${APACHE_LOG_DIR}/mypython_error.log
+    CustomLog ${APACHE_LOG_DIR}/mypython_acces.log combined
+</VirtualHost>
+...
+
+/var/www/mypython/index.py
+
+...
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
+print("Content-type: text/html\n\n")
+print("<html>\n<body>")
+print("<div style=\"width: 100%; font-size: 40px; font-weight: bold; text-align: center;\">")
+print("Python Script Test Page")
+print("</div>\n</body>\n</html>")
+
+...
+
+$ chmod 775 index.py
+
+
+
+
+
+
+
+
+
+

@@ -27,12 +27,19 @@ sudo netstat -ap
 查看各个端口监听的服务
 sudo netstat -ntlup
  
-
 查看tcp端口 
 netstat -tupln
 
 开启端口1337
 sudo ufw allow 1337
+
+查看外部端口
+sudo ufw  status
+
+
+打开或者关闭或者重启防火墙：
+ufw  enable|disable|reload
+
 
 查看ssh服务是否开启
 sudo service ssh status
